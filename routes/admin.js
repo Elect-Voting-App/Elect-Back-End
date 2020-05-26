@@ -27,9 +27,20 @@ router.post('/login', async (req, res) => {
     if (ans) {
       //Login Admin
       console.log("Logging in");
-      res.json({
-        message: "Logging you in."
-      })
+      Admin.findByEmail(email, (err, data) => {
+        if (err) {
+          res.status(500).json({
+            message: err.message
+          });
+        }
+
+        //Retrieving Admin data
+        if (data) {
+          res.json({
+            message: data
+          });
+        }
+      });
     }
   })
 });
