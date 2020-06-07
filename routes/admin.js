@@ -2,6 +2,8 @@ const router = require('express').Router();
 const { encryption, validation } = require('../misc/encryption');
 const date = require('../misc/date');
 const Admin = require('../models/admin');
+const { jwtSiging, passportAuth } = require('../misc/passport');
+const randtoken = require('rand-token');
 
 //Admin login route
 router.post('/login', async (req, res) => {
@@ -26,7 +28,6 @@ router.post('/login', async (req, res) => {
     const ans = await validation(password, data.password);
     if (ans) {
       //Login Admin
-      console.log("Logging in");
       Admin.findByEmail(email, (err, data) => {
         if (err) {
           res.status(500).json({
@@ -36,9 +37,31 @@ router.post('/login', async (req, res) => {
 
         //Retrieving Admin data
         if (data) {
-          res.json({
-            message: data
+          const admin = {
+            name: data.firstname + ' ' + data.lastname,
+            email: data.email,
+            role: data.role
+          };
+
+          //Getting token
+          const token = jwtSiging(admin);
+          const refreshToken = randtoken.uid(256);
+
+          //Call Save token
+          Admin.saveRefreshToken(admin.email, refreshToken, (err, data) => {
+            if (err) {
+              res.status(500).json({
+                message: err.message
+              });
+            }
+
+            if (data) {
+              res.json({ jwt: token, name: admin.name, email: admin.email, role: admin.role, refreshToken: refreshToken });
+            }
           });
+          console.log("Logging in");
+          console.log(refreshToken);
+
         }
       });
     }
@@ -89,6 +112,21 @@ router.post('/register', async (req, res) => {
     }
   });
 
+});
+
+//Admin logout route
+router.post('/logout', (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  //Delete token from database
+  Admin.deleteRefreshToken(refreshToken, (err, data) => {
+    if (err) {
+      res.status(500).json({
+        message: err.message
+      });
+    }
+
+    else res.sendStatus(204);
+  });
 });
 
 module.exports = router;

@@ -43,7 +43,7 @@ Admin.findByEmail = (adminEmail, result) => {
     }
 
     //No match Found
-    result({ kind: "No match found"}, null);
+    result({ kind: "No match found" }, null);
   });
 };
 
@@ -64,7 +64,44 @@ Admin.getPass = (adminEmail, result) => {
     }
 
     //No match Found
-    result({ kind: "No match found"}, null);
+    result({ kind: "No match found" }, null);
+  });
+};
+
+//Saving refreshToken into Database
+Admin.saveRefreshToken = (adminEmail, refreshToken, result) => {
+  sql.query("INSERT INTO token SET email = ?, refresh_token = ?", [adminEmail, refreshToken], (err, res) => {
+    //Error 
+    if (err) {
+      console.log('Error: ' + err);
+      result(err, null);
+      return;
+    }
+
+    //On Success
+    console.log('Token Saved Successfully')
+    result(null, { id: res.insertId });
+  });
+};
+
+//Deleting refreshToken from Database
+Admin.deleteRefreshToken = (refreshToken, result) => {
+  sql.query(`DELETE FROM token WHERE refresh_token = '${refreshToken}'`, (err, res) => {
+    //Error
+    if (err) {
+      result(err, null);
+      return;
+    }
+
+    if (res.affectedRows == 0) {
+      //No token found
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    //On Success
+    console.log('Token deleted Successfully');
+    result(null, res);
   });
 };
 
