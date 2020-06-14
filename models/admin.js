@@ -16,13 +16,17 @@ Admin.register = (newAdmin, result) => {
   sql.query("INSERT INTO admin SET ?", newAdmin, (err, res) => {
     if (err) {
       console.log('Error: ' + err);
-      result(err, null);
-      return;
+      return result(err, null);
     }
 
-    //On success 
-    console.log('Admin Added Successfully');
-    result(null, { id: res.insertId, ...newAdmin });
+    if (res.affectedRows == 1) {
+      //On success 
+      console.log('Admin Added Successfully');
+      return result(null, { id: res.insertId, ...newAdmin });
+      
+    } else {
+      return result(null,null);
+    }
   });
 };
 
@@ -37,13 +41,12 @@ Admin.findByEmail = (adminEmail, result) => {
     }
 
     //Email match found
-    if (res.length) {
+    if (res.length > 0) {
       result(null, res[0]);
       return;
+    } else {
+      return result(null, null);
     }
-
-    //No match Found
-    result({ kind: "No match found" }, null);
   });
 };
 
@@ -58,13 +61,13 @@ Admin.getPass = (adminEmail, result) => {
     }
 
     //Email match found
-    if (res.length) {
-      result(null, res[0]);
-      return;
+    if (res.length > 0) {
+      return result(null, res[0]);
     }
-
-    //No match Found
-    result({ kind: "No match found" }, null);
+    else {
+      //No match Found
+      return result(null, null);
+    }
   });
 };
 
@@ -84,6 +87,29 @@ Admin.saveRefreshToken = (adminEmail, refreshToken, result) => {
   });
 };
 
+//Checking if refreshToken is in the Database
+Admin.checkRefreshToken = (refreshToken, result) => {
+  sql.query(`SELECT email FROM token WHERE refresh_token = '${refreshToken}'`, (err, res) => {
+    //Error
+    if (err) {
+      console.log('Error: ' + err);
+      result(err, null);
+      return;
+    }
+
+    //Token match found
+    if (res.length > 0) {
+      result(null, res[0]);
+      return;
+    } //No Match found
+    else {
+      console.log(res);
+      result(null, null);
+    }
+
+  });
+};
+
 //Deleting refreshToken from Database
 Admin.deleteRefreshToken = (refreshToken, result) => {
   sql.query(`DELETE FROM token WHERE refresh_token = '${refreshToken}'`, (err, res) => {
@@ -95,7 +121,7 @@ Admin.deleteRefreshToken = (refreshToken, result) => {
 
     if (res.affectedRows == 0) {
       //No token found
-      result({ kind: "not_found" }, null);
+      result(null, null);
       return;
     }
 

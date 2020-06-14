@@ -69,7 +69,7 @@ router.post('/login', async (req, res) => {
 });
 
 //Admin register route
-router.post('/register', async (req, res) => {
+router.post('/register', passportAuth, async (req, res) => {
 
   //Getting all values from request
   const { firstname, lastname, email, password, role } = req.body;
@@ -89,29 +89,36 @@ router.post('/register', async (req, res) => {
   //Checking if email already exists
   Admin.findByEmail(email, (err, data) => {
     if (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message
       });
     }
 
     if (data) {
-      res.json({
+      return res.json({
+        status: false,
         message: "Email Already Exists"
       });
-    } else {
+    }
+    else {
       //Save admin in database
       Admin.register(admin, (err, data) => {
         if (err) {
-          res.status(500).json({
-            message:
-              err.message || "Some error occurred while creating the Administrator."
+          return res.status(500).json({
+            status: false,
+            message: err.message || "Some error occurred while creating the Administrator."
           });
         }
-        else res.json(data);
+        if (data) {
+          console.log(data);
+          return res.json({
+            status: true,
+            message: data
+          });
+        }
       });
     }
   });
-
 });
 
 //Admin logout route
@@ -120,12 +127,54 @@ router.post('/logout', (req, res) => {
   //Delete token from database
   Admin.deleteRefreshToken(refreshToken, (err, data) => {
     if (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message
       });
     }
 
-    else res.sendStatus(204);
+    else return res.sendStatus(204);
+  });
+});
+
+//Admin refresh route
+router.post('/refresh', (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  //Checking if refresh token Exists in the database
+  Admin.checkRefreshToken(refreshToken, (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        message: err.message
+      });
+    }
+
+    //Token Match Found
+    if (data) {
+      //Using reponse to get Admin model for JWT signing
+      Admin.findByEmail(data.email, (err, data) => {
+        if (err) {
+          return res.status(500).json({
+            message: err.message
+          });
+        }
+
+        //Retrieving Admin data
+        if (data) {
+          const admin = {
+            name: data.firstname + ' ' + data.lastname,
+            email: data.email,
+            role: data.role
+          };
+
+          //Getting token
+          const token = jwtSiging(admin);
+
+          return res.json({ jwt: token });
+
+        }
+      });
+    } else {
+      return res.sendStatus(401);
+    }
   });
 });
 
