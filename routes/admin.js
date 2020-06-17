@@ -19,7 +19,8 @@ router.post('/login', async (req, res) => {
     }
 
     if (!data) {
-      res.json({
+      return res.json({
+        status: false,
         message: "Invalid Credentials."
       });
     }
@@ -56,13 +57,16 @@ router.post('/login', async (req, res) => {
             }
 
             if (data) {
-              res.json({ jwt: token, name: admin.name, email: admin.email, role: admin.role, refreshToken: refreshToken });
+              res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, refreshToken: refreshToken });
             }
           });
           console.log("Logging in");
-          console.log(refreshToken);
-
         }
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: "Invalid Credentials."
       });
     }
   })
@@ -90,6 +94,7 @@ router.post('/register', passportAuth, async (req, res) => {
   Admin.findByEmail(email, (err, data) => {
     if (err) {
       return res.status(500).json({
+        status: false,
         message: err.message
       });
     }
@@ -97,7 +102,7 @@ router.post('/register', passportAuth, async (req, res) => {
     if (data) {
       return res.json({
         status: false,
-        message: "Email Already Exists"
+        message: 'Admin Already Exists.'
       });
     }
     else {
@@ -113,7 +118,7 @@ router.post('/register', passportAuth, async (req, res) => {
           console.log(data);
           return res.json({
             status: true,
-            message: data
+            message: 'Admin Successfully Created.'
           });
         }
       });
