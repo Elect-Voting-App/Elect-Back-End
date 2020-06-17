@@ -158,6 +158,7 @@ router.post('/refresh', (req, res) => {
       Admin.findByEmail(data.email, (err, data) => {
         if (err) {
           return res.status(500).json({
+            status: false,
             message: err.message
           });
         }
@@ -182,5 +183,59 @@ router.post('/refresh', (req, res) => {
     }
   });
 });
+
+//Admin Delete route
+router.delete('/remove/:id', passportAuth, async (req, res) => {
+  const id = req.params.id;
+  Admin.deleteAdmin(id, (err, data) => {
+    //Error
+    if (err) {
+      return res.json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true,
+        message: 'Admin Deleted Successfully'
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Match Found for Admin'
+      });
+    }
+  });
+});
+
+//All Admins route
+router.get('/all-admins', (req, res) => {
+  //Getting Admins
+  Admin.getAll((err, data) => {
+    //Error
+    if (err) {
+      return res.json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Getting data
+    if (data) {
+      return res.send({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Administrators found'
+      });
+    }
+  });
+});
+
 
 module.exports = router;

@@ -71,6 +71,47 @@ Admin.getPass = (adminEmail, result) => {
   });
 };
 
+//Getting all Administrators
+Admin.getAll = result => {
+  sql.query('SELECT id, firstname, lastname, email, role, date_registered from admin', (err, res) => {
+    //Error
+    if (err) {
+      console.log('Error: '+ err);
+      return result(err, null)
+    }
+
+    //Getting admin data
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No admin data
+      return result(null, null);
+    }
+  });
+};
+
+//Deleting Administrators
+Admin.deleteAdmin = (id, result) => {
+  sql.query(`DELETE FROM admin WHERE id = ${id}`, (err, res) => {
+    //Error
+    if (err) {
+      console.log('Error ' + err);
+      return result(err, null);
+    }
+
+    //No Match Found
+    if (res.affectedRows == 0) {
+      //No token found
+      result(null, null);
+      return;
+    }
+
+    //On Success
+    console.log('Admin deleted Successfully');
+    return result(null, res);
+  });
+};
+
 //Saving refreshToken into Database
 Admin.saveRefreshToken = (adminEmail, refreshToken, result) => {
   sql.query("INSERT INTO token SET email = ?, refresh_token = ?", [adminEmail, refreshToken], (err, res) => {
@@ -127,7 +168,7 @@ Admin.deleteRefreshToken = (refreshToken, result) => {
 
     //On Success
     console.log('Token deleted Successfully');
-    result(null, res);
+    return result(null, res);
   });
 };
 
