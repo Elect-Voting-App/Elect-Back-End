@@ -22,7 +22,23 @@ router.post('/admin', (req, res) => {
 
 });
 
-//Multiple Mailing
+//Sending Email for password reset
+router.post('/update-pass', (req, res) => {
+  let user = req.body;
 
+  Mailer.passwordUpdate(user, info => {
+    if (info.accepted != null) {
+      return res.json({
+        status: true,
+        message: 'Updated Successfully.'
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'Error occured updating password.'
+      });
+    }
+  });
+});
 
 module.exports = router;

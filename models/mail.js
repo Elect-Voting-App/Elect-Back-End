@@ -40,4 +40,27 @@ const adminMailer = async function adminMail(user, callback) {
   callback(info);
 }
 
+const passwordUpdate = async function passwordUpdate(user, callback) {
+  //Setting Mail option 
+  let mailOptions = {
+    from: `"ELECT VOTING SYSTEM" ${process.env.NODEMAILER_EMAIL}`, //Senders address
+    to: user.email,
+    subject: 'ELECT Voting System: Account Password Reset',
+    html: `Hello,<br>
+    You requested a password reset at ELECT Voting System and you have been issued with a new temporary password.<br>
+    Your current login information is:<br>
+    email: ${user.email}<br>
+    password: ${user.password}<br><br>
+    You will have to change your password when you log in .<br><br>
+    ELECT Voting System Admin<br>
+    ${process.env.NODEMAILER_EMAIL}` 
+  };
+
+  //Send email with defined transport object
+  let info = await transporter.sendMail(mailOptions);
+
+  callback(info);
+};
+
 module.exports.adminMailer = adminMailer;
+module.exports.passwordUpdate = passwordUpdate;
