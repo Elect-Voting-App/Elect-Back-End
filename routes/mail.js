@@ -24,4 +24,5 @@ router.post('/admin', (req, res) => {
 
 //Multiple Mailing
 
+
 module.exports = router;

@@ -42,8 +42,8 @@ Admin.findByEmail = (adminEmail, result) => {
 
     //Email match found
     if (res.length > 0) {
-      result(null, res[0]);
-      return;
+      return result(null, res[0]);
+      
     } else {
       return result(null, null);
     }
@@ -85,6 +85,26 @@ Admin.getAll = result => {
       return result(null, res);
     } else {
       //No admin data
+      return result(null, null);
+    }
+  });
+};
+
+//Search For admin
+Admin.searchAdmin = (adminEmail, result) => {
+  sql.query(`SELECT id, firstname, lastname, email, role, date_registered  FROM admin WHERE email = '${adminEmail}'`, (err, res) => {
+    //Error 
+    if (err) {
+      console.log('Error: ' + err);
+      result(err, null);
+      return;
+    }
+
+    //Email match found
+    if (res.length > 0) {
+      return result(null, res);
+      
+    } else {
       return result(null, null);
     }
   });
@@ -151,23 +171,40 @@ Admin.checkRefreshToken = (refreshToken, result) => {
   });
 };
 
-//Deleting refreshToken from Database
+//Deleting refreshToken
 Admin.deleteRefreshToken = (refreshToken, result) => {
   sql.query(`DELETE FROM token WHERE refresh_token = '${refreshToken}'`, (err, res) => {
     //Error
     if (err) {
-      result(err, null);
-      return;
+      return result(err, null);
     }
 
     if (res.affectedRows == 0) {
       //No token found
-      result(null, null);
-      return;
+      return result(null, null);
     }
 
     //On Success
     console.log('Token deleted Successfully');
+    return result(null, res);
+  });
+};
+
+//Updating Password
+Admin.updatePassword = (adminEmail, adminPass, result) => {
+  sql.query(`UPDATE admin SET password = '${adminPass}' WHERE email = '${adminEmail}'`, (err, res) => {
+    //Error 
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 0) {
+      //No match found for the email
+      return result(null, null);
+    }
+
+    //On Success
+    console.log('Update Successful');
     return result(null, res);
   });
 };

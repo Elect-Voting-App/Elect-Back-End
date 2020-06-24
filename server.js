@@ -23,6 +23,6 @@ app.use(cors());
 
 //Route Middleware
 app.use('/api/admin', adminAuth);
-app.use('/api/mailing', mailer)
+app.use('/api/mailing', mailer);
 
 app.listen(PORT, console.log(`Server started on port ${PORT}`));

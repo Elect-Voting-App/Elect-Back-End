@@ -9,12 +9,14 @@ const randtoken = require('rand-token');
 router.post('/login', async (req, res) => {
   //Getting values from request
   const { email, password } = req.body;
+  console.log(email);
 
   //Checking for email exists in db 
   Admin.getPass(email, async (err, data) => {
     if (err) {
-      res.status(500).json({
-        message: err
+      return res.status(500).json({
+        status: false,
+        message: err.message
       });
     }
 
@@ -31,7 +33,8 @@ router.post('/login', async (req, res) => {
       //Login Admin
       Admin.findByEmail(email, (err, data) => {
         if (err) {
-          res.status(500).json({
+          return res.status(500).json({
+            status: false,
             message: err.message
           });
         }
@@ -44,6 +47,7 @@ router.post('/login', async (req, res) => {
             role: data.role
           };
 
+          console.log('Got to signing')
           //Getting token
           const token = jwtSiging(admin);
           const refreshToken = randtoken.uid(256);
@@ -51,16 +55,17 @@ router.post('/login', async (req, res) => {
           //Call Save token
           Admin.saveRefreshToken(admin.email, refreshToken, (err, data) => {
             if (err) {
-              res.status(500).json({
+              return res.status(500).json({
+                status: false,
                 message: err.message
               });
             }
 
             if (data) {
-              res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, refreshToken: refreshToken });
+              console.log("Logging in");
+              return res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, refreshToken: refreshToken });
             }
           });
-          console.log("Logging in");
         }
       });
     } else {
@@ -69,7 +74,7 @@ router.post('/login', async (req, res) => {
         message: "Invalid Credentials."
       });
     }
-  })
+  });
 });
 
 //Admin register route
@@ -148,6 +153,7 @@ router.post('/refresh', (req, res) => {
   Admin.checkRefreshToken(refreshToken, (err, data) => {
     if (err) {
       return res.status(500).json({
+        status: false,
         message: err.message
       });
     }
@@ -211,12 +217,12 @@ router.delete('/remove/:id', passportAuth, async (req, res) => {
 });
 
 //All Admins route
-router.get('/all-admins', (req, res) => {
+router.get('/all-admins', passportAuth, async (req, res) => {
   //Getting Admins
   Admin.getAll((err, data) => {
     //Error
     if (err) {
-      return res.json({
+      return res.status(500).json({
         status: false,
         message: err.message
       });
@@ -237,5 +243,62 @@ router.get('/all-admins', (req, res) => {
   });
 });
 
+//Searching for Admin
+router.post('/search', passportAuth, async (req, res) => {
+  const email = req.body.email;
+
+  Admin.searchAdmin(email, (err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      console.log(data);
+      return res.json({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Match Found'
+      });
+    }
+  });
+});
+
+router.put('/update-pass', passportAuth, async (req, res) => {
+  const { email, password } = req.body;
+  console.log(email + " " + password + " ");
+
+  //Encrypting password
+  const hashedPassword = await encryption(password);
+  //Updating the actual password
+  Admin.updatePassword(email, hashedPassword, (err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true,
+        message: 'Updated Successfully.'
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'Error occured updating password.'
+      });
+    }
+  });
+});
 
 module.exports = router;
