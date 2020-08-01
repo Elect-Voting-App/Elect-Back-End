@@ -4,7 +4,10 @@ const date = require('../misc/date');
 const Admin = require('../models/admin');
 const { jwtSiging, passportAuth } = require('../misc/passport');
 const randtoken = require('rand-token');
-const upload = require('../misc/file-handling');
+const upload = require('../misc/multer');
+const csvOutput = require('../misc/csv-handler');
+
+
 
 //Admin login route
 router.post('/login', async (req, res) => {
@@ -304,7 +307,30 @@ router.put('/update-pass', passportAuth, async (req, res) => {
 
 router.post('/register-voter', upload.single('file'), (req, res) => {
   const file = req.file;
-  console.log(file.filename)
+  csvOutput(file.filename, (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Looping through result data
+    data.forEach( async row => {
+      console.log(row.password)
+      //Hashing Password
+      const hashedPassword = await encryption(row.password);  
+
+      //Inserting Data into Database
+      
+
+    });
+
+    res.json({
+      status: true,
+      message: data
+    })
+  });
   // res.send(file);
 });
 
