@@ -1,6 +1,5 @@
 const fs = require('fs');
 const csv = require('fast-csv');
-const { encryption } = require('./encryption');
 
 let csvOutput = (filename, result) => { 
   let csvData = [];

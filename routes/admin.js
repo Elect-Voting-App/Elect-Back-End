@@ -6,6 +6,7 @@ const { jwtSiging, passportAuth } = require('../misc/passport');
 const randtoken = require('rand-token');
 const upload = require('../misc/multer');
 const csvOutput = require('../misc/csv-handler');
+const Voter = require('../models/voter');
 
 
 
@@ -316,22 +317,57 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
     }
 
     //Looping through result data
-    data.forEach( async row => {
-      console.log(row.password)
+    data.forEach(async row => {
       //Hashing Password
-      const hashedPassword = await encryption(row.password);  
+      const hashedPassword = await encryption(row.password);
 
-      //Inserting Data into Database
-      
+      let voter = new Voter({
+        firstname: row.firstname,
+        lastname: row.lastname,
+        email: row.email,
+        studentID: row.studentID,
+        hallID: row.hallID,
+        year: row.year,
+        password: hashedPassword,
+        date_registered: date()
+      });
 
+      //Check if voter exists 
+      Voter.findByEmail(row.email, (err, data) => {
+        if (err) {
+          return res.status(500).json({
+            status: false,
+            message: err.message
+          });
+        }
+        if (data) {
+          return res.json({
+            status: false,
+            message: `Voter with email ( ${row.email} ) Already Exists.`
+          });
+        }
+        else {
+          //Inserting Data into Database
+          Voter.register(voter, (err, data) => {
+            //Error
+            if (err) {
+              return res.status(500).json({
+                status: false,
+                message: err.message
+              });
+            }
+            if (data) {
+              return res.json({
+                status: true,
+                message: 'Voter Registered Successfully'
+              });
+            }
+          });
+        }
+      });
+      //End of Check
     });
-
-    res.json({
-      status: true,
-      message: data
-    })
   });
-  // res.send(file);
 });
 
 module.exports = router;
