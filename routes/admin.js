@@ -4,6 +4,7 @@ const date = require('../misc/date');
 const Admin = require('../models/admin');
 const { jwtSiging, passportAuth } = require('../misc/passport');
 const randtoken = require('rand-token');
+const upload = require('../misc/file-handling');
 
 //Admin login route
 router.post('/login', async (req, res) => {
@@ -299,6 +300,12 @@ router.put('/update-pass', passportAuth, async (req, res) => {
       });
     }
   });
+});
+
+router.post('/register-voter', upload.single('file'), (req, res) => {
+  const file = req.file;
+  console.log(file.filename)
+  // res.send(file);
 });
 
 module.exports = router;
