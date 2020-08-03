@@ -6,9 +6,10 @@ dotenv.config();
 
 //Creating reusable transporter object using the default SMTP transport
 let transporter = nodemailer.createTransport({
-  host: process.env.NODEMAILER_HOST,
-  port: 587,
-  secure: false,
+  // host: process.env.NODEMAILER_HOST,
+  // port: 587,
+  // secure: false,
+  service: 'gmail',
   auth: {
     user: process.env.NODEMAILER_USER,
     pass: process.env.NODEMAILER_PASSWORD
