@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { encryption, validation } = require('../misc/encryption');
+const { encryption, validation, syncEncryption } = require('../misc/encryption');
 const date = require('../misc/date');
 const Admin = require('../models/admin');
 const { jwtSiging, passportAuth } = require('../misc/passport');
@@ -308,6 +308,7 @@ router.put('/update-pass', passportAuth, async (req, res) => {
 
 router.post('/register-voter', upload.single('file'), (req, res) => {
   const file = req.file;
+  let ans = [];
   csvOutput(file.filename, (err, data) => {
     if (err) {
       return res.status(500).json({
@@ -316,24 +317,28 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
       });
     }
 
+    /* let i;
     //Looping through result data
-    data.forEach(async row => {
-      //Hashing Password
-      const hashedPassword = await encryption(row.password);
-
+    for (i = 0; i < data.length; i++) {
+      console.log(data[i]);
+      //Hashing password
+      const hashedPassword = syncEncryption(data[i].password);
+      
       let voter = new Voter({
-        firstname: row.firstname,
-        lastname: row.lastname,
-        email: row.email,
-        studentID: row.studentID,
-        hallID: row.hallID,
-        year: row.year,
+        firstname: data[i].firstname,
+        lastname: data[i].lastname,
+        email: data[i].email,
+        studentID: data[i].studentID,
+        hallID: data[i].hallID,
+        year: data[i].year,
         password: hashedPassword,
         date_registered: date()
       });
 
+      console.log(voter);
+
       //Check if voter exists 
-      Voter.findByEmail(row.email, (err, data) => {
+      Voter.findByEmail(data[i].email, (err, data) => {
         if (err) {
           return res.status(500).json({
             status: false,
@@ -341,9 +346,9 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
           });
         }
         if (data) {
-          return res.json({
+          ans.push({
             status: false,
-            message: `Voter with email ( ${row.email} ) Already Exists.`
+            message: `Voter with email ( ${data[i].email} ) Already Exists.`
           });
         }
         else {
@@ -365,9 +370,80 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
           });
         }
       });
-      //End of Check
+      console.log(ans)
+    } */
+    data.forEach(row => {
+      //Hashing Password
+      const hashedPassword = syncEncryption(row.password);
+
+      let voter = new Voter({
+        firstname: row.firstname,
+        lastname: row.lastname,
+        email: row.email,
+        studentID: row.studentID,
+        hallID: row.hallID,
+        year: row.year,
+        password: hashedPassword,
+        date_registered: date()
+      });
+
+      console.log(voter)
+
+      //Check if voter exists 
+      Voter.findByEmail(row.email, (err, data) => {
+        if (err) {
+          return res.status(500).json({
+            status: false,
+            message: err.message
+          });
+        }
+        if (data) {
+          ans.push({
+            status: false,
+            message: `Voter with email ( ${row.email} ) Already Exists.`
+          });
+          console.log('Inside loop array '+ans)
+        }
+        else {
+          //Inserting Data into Database
+          Voter.register(voter, (err, data) => {
+            //Error
+            if (err) {
+              return res.status(500).json({
+                status: false,
+                message: err.message
+              });
+            }
+            if (data) {
+              return res.json({
+                status: true,
+                message: 'Voter Registered Successfully'
+              });
+            }
+          });
+        }
+      });
+      console.log('loop got here')
+      // End of Check
+      // if (data.length) {
+
+      //   // console.log(ans.length);
+      //   // console.log(data.length);
+      //   res.json(ans);
+      // }
+      if (Object.keys(ans).length === data.length) {
+        console.log('got inside')
+        res.json(ans);
+      }
     });
+    console.log('got here')
+    console.log(ans)
+    // if (Object.keys(ans).length === data.length) {
+    //   console.log('got inside')
+    //   res.json(ans);
+    // }
   });
+  console.log('outside')
 });
 
 module.exports = router;
