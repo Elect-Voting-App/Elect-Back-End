@@ -306,6 +306,8 @@ router.put('/update-pass', passportAuth, async (req, res) => {
   });
 });
 
+
+/*==== VOTER ROUTER ====*/
 router.post('/register-voter', upload.single('file'), (req, res) => {
   const file = req.file;
   let ans = [];
@@ -444,6 +446,33 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
     // }
   });
   console.log('outside')
+});
+
+//All Voters route
+router.get('/all-voters', passportAuth, (req, res) => {
+  //Getting All Voters
+  Voter.getAll((err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Getting data
+    if (data) {
+      return res.send({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Voters found'
+      });
+    }
+  });
 });
 
 module.exports = router;

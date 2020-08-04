@@ -103,7 +103,6 @@ Admin.searchAdmin = (adminEmail, result) => {
     //Email match found
     if (res.length > 0) {
       return result(null, res);
-      
     } else {
       return result(null, null);
     }

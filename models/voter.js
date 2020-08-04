@@ -51,6 +51,23 @@ Voter.findByEmail = (voterEmail, result) => {
   });
 };
 
+Voter.searchVoter = (voterEmail, result) => {
+  sql.query(`SELECT id, firstname, lastname, student_id, email, date_registered FROM voter WHERE email LIKE '%${voterEmail}%'`, (err, res) => {
+    //Error 
+    if (err) {
+      console.log('Error: ' + err);
+      return result(err, null);
+    }
+
+    //Email match found
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      return result(null, null);
+    }
+  });
+};
+
 //Deleting voter from Database
 Voter.deleteVoter = (id, result) => {
   sql.query(`DELETE FROM voter WHERE id = ${id}`, (err, res) => {
@@ -70,6 +87,25 @@ Voter.deleteVoter = (id, result) => {
     //On Success
     console.log('Admin deleted Successfully');
     return result(null, res);
+  });
+};
+
+//Get all voters
+Voter.getAll = result => {
+  sql.query('SELECT id, firstname, lastname, email, student_id, hall_id, date_registered from voter', (err, res) => {
+    //Error
+    if (err) {
+      console.log('Error: '+ err);
+      return result(err, null)
+    }
+
+    //Getting admin data
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No admin data
+      return result(null, null);
+    }
   });
 };
 
