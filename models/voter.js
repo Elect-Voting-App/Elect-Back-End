@@ -32,8 +32,8 @@ Voter.register = (newVoter, result) => {
 };
 
 //Finding Voter using email
-Voter.findByEmail = (voter, result) => {
-  sql.query(`SELECT id, firstname, lastname, email, date_registered  FROM voter WHERE email = '${voter}'`, (err, res) => {
+Voter.findByEmail = (voterEmail, result) => {
+  sql.query(`SELECT id, firstname, lastname, email, date_registered FROM voter WHERE email = '${voterEmail}'`, (err, res) => {
     //Error 
     if (err) {
       console.log('Error: ' + err);
@@ -48,6 +48,28 @@ Voter.findByEmail = (voter, result) => {
     } else {
       return result(null, null);
     }
+  });
+};
+
+//Deleting voter from Database
+Voter.deleteVoter = (id, result) => {
+  sql.query(`DELETE FROM voter WHERE id = ${id}`, (err, res) => {
+    //Error
+    if (err) {
+      console.log('Error ' + err);
+      return result(err, null);
+    }
+
+    //No Match Found
+    if (res.affectedRows == 0) {
+      //No token found
+      result(null, null);
+      return;
+    }
+
+    //On Success
+    console.log('Admin deleted Successfully');
+    return result(null, res);
   });
 };
 
