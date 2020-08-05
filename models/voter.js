@@ -52,7 +52,7 @@ Voter.findByEmail = (voterEmail, result) => {
 };
 
 Voter.searchVoter = (voterEmail, result) => {
-  sql.query(`SELECT id, firstname, lastname, student_id, email, date_registered FROM voter WHERE email LIKE '%${voterEmail}%'`, (err, res) => {
+  sql.query(`SELECT id, firstname, lastname, student_id, email, hall_id, date_registered FROM voter WHERE email LIKE '%${voterEmail}%'`, (err, res) => {
     //Error 
     if (err) {
       console.log('Error: ' + err);
@@ -106,6 +106,25 @@ Voter.getAll = result => {
       //No admin data
       return result(null, null);
     }
+  });
+};
+
+//Update Voter Password 
+Voter.updatePassword = (adminEmail, adminPass, result) => {
+  sql.query(`UPDATE admin SET password = '${adminPass}' WHERE email = '${adminEmail}'`, (err, res) => {
+    //Error 
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 0) {
+      //No match found for the email
+      return result(null, null);
+    }
+
+    //On Success
+    console.log('Update Successful');
+    return result(null, res);
   });
 };
 

@@ -475,4 +475,61 @@ router.get('/all-voters', passportAuth, (req, res) => {
   });
 });
 
+router.post('/voterSearch', passportAuth, async (req, res) => {
+  const email = req.body.email;
+
+  Voter.searchVoter(email, (err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      console.log(data);
+      return res.json({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Match Found'
+      });
+    }
+  });
+});
+
+router.put('/update-voter-pass', passportAuth, async (req, res) => {
+  const { email, password } = req.body;
+  console.log(email + " " + password + " ");
+
+  //Encrypting password
+  const hashedPassword = await encryption(password);
+  //Updating the actual password
+  Voter.updatePassword(email, hashedPassword, (err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true,
+        message: 'Updated Successfully.'
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'Error occured updating password.'
+      });
+    }
+  });
+});
+
 module.exports = router;
