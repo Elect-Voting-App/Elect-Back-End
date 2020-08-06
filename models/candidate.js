@@ -10,8 +10,8 @@ const Candidate = function (candidate) {
 };
 
 //Find Candidate using email
-Candidate.findByEmail = (candidateEmail, result) => {
-  sql.query(``, (err, res) => {
+Candidate.findCandidate = (candidateFirstname, candidateLastname, result) => {
+  sql.query(`SELECT firstname, lastname WHERE firstname = '${candidateFirstname}' AND lastname = '${candidateLastname}'`, (err, res) => {
     // Mysql Error
     if (err) {
       console.log('Error: ' + err);
@@ -81,6 +81,23 @@ Candidate.getCategories = result => {
     } else {
       //No Categories found
       return result(null, null);
+    }
+  });
+};
+
+Candidate.register = (newCandidate, result) => {
+  sql.query('INSERT INTO candidate SET ?', newCandidate, (err, res) => {
+    if (err) {
+      console.log('Error: ' + err);
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 1) {
+      //On success 
+      console.log('Candidate Added Successfully');
+      return result(null, { id: res.insertId, ...newCandidate });
+    } else {
+      return result(null,null);
     }
   });
 };

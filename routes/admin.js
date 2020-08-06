@@ -405,7 +405,7 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
             status: false,
             message: `Voter with email ( ${row.email} ) Already Exists.`
           });
-          console.log('Inside loop array '+ans)
+          console.log('Inside loop array ' + ans)
         }
         else {
           //Inserting Data into Database
@@ -535,7 +535,7 @@ router.put('/update-voter-pass', passportAuth, async (req, res) => {
 
 /*==== Candidate Routes ====*/
 router.get('/all-candidates', passportAuth, (req, res) => {
-  Candidate.getAll((err,data) => {
+  Candidate.getAll((err, data) => {
     //Error
     if (err) {
       return res.status(500).json({
@@ -606,6 +606,56 @@ router.get('/categories', passportAuth, (req, res) => {
       return res.json({
         status: false,
         message: 'No Categories found'
+      });
+    }
+  });
+});
+
+//Register Candidate
+router.post('/register-candidate', passportAuth, (req, res) => {
+  const { firstname, lastname, category_id, position_id } = req.body;
+
+  let candidate = new Candidate({
+    firstname,
+    lastname,
+    category_id,
+    position_id
+  });
+
+  //Search Candidate 
+  Candidate.findCandidate(firstname, lastname, (err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Check
+    if (data) {
+      return res.json({
+        status: false,
+        message: 'Candidate Already Exists.'
+      });
+    } else {
+      //Register method
+      Candidate.register(candidate, (err, data) => {
+        //Error
+        if (err) {
+          return res.status(500).json({
+            status: false,
+            message: err.message
+          });
+        }
+
+        if (data) {
+          console.log(data);
+          return res.json({
+            status: true,
+            message: 'Candidate Successfully Created.'
+          });
+        }
       });
     }
   });
