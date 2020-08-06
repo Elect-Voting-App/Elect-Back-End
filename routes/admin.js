@@ -613,13 +613,13 @@ router.get('/categories', passportAuth, (req, res) => {
 
 //Register Candidate
 router.post('/register-candidate', passportAuth, (req, res) => {
-  const { firstname, lastname, category_id, position_id } = req.body;
+  const { firstname, lastname, category, position } = req.body;
 
   let candidate = new Candidate({
     firstname,
     lastname,
-    category_id,
-    position_id
+    category_id: category,
+    position_id: position
   });
 
   //Search Candidate 

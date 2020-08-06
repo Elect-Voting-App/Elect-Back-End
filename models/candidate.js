@@ -11,7 +11,7 @@ const Candidate = function (candidate) {
 
 //Find Candidate using email
 Candidate.findCandidate = (candidateFirstname, candidateLastname, result) => {
-  sql.query(`SELECT firstname, lastname WHERE firstname = '${candidateFirstname}' AND lastname = '${candidateLastname}'`, (err, res) => {
+  sql.query(`SELECT firstname, lastname FROM candidate WHERE firstname = '${candidateFirstname}' AND lastname = '${candidateLastname}'`, (err, res) => {
     // Mysql Error
     if (err) {
       console.log('Error: ' + err);
