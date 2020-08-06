@@ -52,7 +52,7 @@ Voter.findByEmail = (voterEmail, result) => {
 };
 
 Voter.searchVoter = (voterEmail, result) => {
-  sql.query(`SELECT id, firstname, lastname, student_id, email, hall_id, date_registered FROM voter WHERE email LIKE '%${voterEmail}%'`, (err, res) => {
+  sql.query(`SELECT firstname, lastname, student_id, email, hall_name, date_registered FROM voter, hall WHERE email LIKE '%${voterEmail}%' AND voter.hall_id = hall.id`, (err, res) => {
     //Error 
     if (err) {
       console.log('Error: ' + err);
@@ -92,7 +92,7 @@ Voter.deleteVoter = (id, result) => {
 
 //Get all voters
 Voter.getAll = result => {
-  sql.query('SELECT id, firstname, lastname, email, student_id, hall_id, date_registered from voter', (err, res) => {
+  sql.query('SELECT firstname, lastname, email, student_id, hall_name, year FROM voter, hall WHERE voter.hall_id = hall.id', (err, res) => {
     //Error
     if (err) {
       console.log('Error: '+ err);
