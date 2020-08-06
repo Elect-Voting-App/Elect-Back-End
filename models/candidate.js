@@ -47,6 +47,24 @@ Candidate.getAll = result => {
   });
 };
 
+//Get all positions
+Candidate.getPositions = result => {
+  sql.query('SELECT * FROM position', (err, res) => {
+    //Mysql Error
+    if (err) {
+      console.log('Error: ' + err);
+      return result(err, null)
+    }
+
+    //Getting Positions
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No positions found
+      return result(null, null);
+    }
+  });
+};
 
 
 module.exports = Candidate;

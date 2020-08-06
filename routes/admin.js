@@ -546,7 +546,7 @@ router.get('/all-candidates', passportAuth, (req, res) => {
 
     //Getting data
     if (data) {
-      return res.send({
+      return res.json({
         status: true,
         data
       });
@@ -554,6 +554,32 @@ router.get('/all-candidates', passportAuth, (req, res) => {
       return res.json({
         status: false,
         message: 'No Candidates found'
+      });
+    }
+  });
+});
+
+//Get positions
+router.get('/positions', passportAuth, (req, res) => {
+  Candidate.getPositions((err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Getting data
+    if (data) {
+      return res.json({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Positions found'
       });
     }
   });
