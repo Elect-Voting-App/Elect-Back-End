@@ -585,4 +585,30 @@ router.get('/positions', passportAuth, (req, res) => {
   });
 });
 
+//Get categories
+router.get('/categories', passportAuth, (req, res) => {
+  Candidate.getCategories((err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Getting Data
+    if (data) {
+      return res.json({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Categories found'
+      });
+    }
+  });
+});
+
 module.exports = router;

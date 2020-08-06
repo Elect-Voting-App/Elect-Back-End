@@ -66,5 +66,24 @@ Candidate.getPositions = result => {
   });
 };
 
+//Get all categories
+Candidate.getCategories = result => {
+  sql.query('SELECT * FROM category', (err, res) => {
+    //Mysql Error
+    if (err) {
+      console.log('Error: ' + err);
+      return result(err, null)
+    }
+
+    //Getting Categories
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No Categories found
+      return result(null, null);
+    }
+  });
+};
+
 
 module.exports = Candidate;
