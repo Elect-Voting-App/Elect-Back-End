@@ -73,7 +73,7 @@ Admin.getPass = (adminEmail, result) => {
 
 //Getting all Administrators
 Admin.getAll = result => {
-  sql.query('SELECT id, firstname, lastname, email, role, date_registered from admin', (err, res) => {
+  sql.query('SELECT id, firstname, lastname, email, role, date_registered FROM admin', (err, res) => {
     //Error
     if (err) {
       console.log('Error: '+ err);

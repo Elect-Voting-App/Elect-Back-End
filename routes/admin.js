@@ -7,6 +7,7 @@ const randtoken = require('rand-token');
 const upload = require('../misc/multer');
 const csvOutput = require('../misc/csv-handler');
 const Voter = require('../models/voter');
+const Candidate = require('../models/candidate');
 
 
 
@@ -527,6 +528,32 @@ router.put('/update-voter-pass', passportAuth, async (req, res) => {
       return res.json({
         status: false,
         message: 'Error occured updating password.'
+      });
+    }
+  });
+});
+
+/*==== Candidate Routes ====*/
+router.get('/all-candidates', passportAuth, (req, res) => {
+  Candidate.getAll((err,data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    //Getting data
+    if (data) {
+      return res.send({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Candidates found'
       });
     }
   });
