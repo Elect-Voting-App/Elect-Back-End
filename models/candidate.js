@@ -9,7 +9,7 @@ const Candidate = function (candidate) {
   this.position_id = candidate.position_id;
 };
 
-//Find Candidate using email
+//Find Candidate using firstname and lastname
 Candidate.findCandidate = (candidateFirstname, candidateLastname, result) => {
   sql.query(`SELECT firstname, lastname FROM candidate WHERE firstname = '${candidateFirstname}' AND lastname = '${candidateLastname}'`, (err, res) => {
     // Mysql Error
@@ -21,6 +21,25 @@ Candidate.findCandidate = (candidateFirstname, candidateLastname, result) => {
     //Email match found
     if (res.length > 0) {
       return result(null, res[0]);
+
+    } else {
+      return result(null, null);
+    }
+  });
+};
+
+//Searching Candidate using firstname and lastname
+Candidate.findCandidate = (candidateFirstname, candidateLastname, result) => {
+  sql.query(`SELECT candidate.id AS id, firstname, lastname, category_name, position_name FROM candidate, category, position WHERE firstname LIKE '%${candidateFirstname}%' AND lastname LIKE '%${candidateLastname}%' AND candidate.category_id = category.id AND candidate.position_id = position.id`, (err, res) => {
+    // Mysql Error
+    if (err) {
+      console.log('Error: ' + err);
+      return result(err, null);
+    }
+
+    //Email match found
+    if (res.length > 0) {
+      return result(null, res);
 
     } else {
       return result(null, null);
@@ -99,6 +118,25 @@ Candidate.register = (newCandidate, result) => {
     } else {
       return result(null,null);
     }
+  });
+};
+
+Candidate.deleteCandidate = (id, result) => {
+  sql.query(`DELETE FROM candidate WHERE id = ${id}`, (err, res) => {
+    //Mysql Error
+    if (err) {
+      console.log('Error' + err);
+      return result(err, null);
+    }
+
+    //No match Found
+    if (res.affectedRows == 0) {
+      return result(null, null);
+    }
+
+    //On Success
+    console.log('Candidate deleted Successfully');
+    return result(null, res);
   });
 };
 

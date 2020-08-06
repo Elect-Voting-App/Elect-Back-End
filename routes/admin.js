@@ -463,7 +463,7 @@ router.get('/all-voters', passportAuth, (req, res) => {
 
     //Getting data
     if (data) {
-      return res.send({
+      return res.json({
         status: true,
         data
       });
@@ -476,7 +476,7 @@ router.get('/all-voters', passportAuth, (req, res) => {
   });
 });
 
-router.post('/voterSearch', passportAuth, async (req, res) => {
+router.post('/search-voter', passportAuth, async (req, res) => {
   const email = req.body.email;
 
   Voter.searchVoter(email, (err, data) => {
@@ -656,6 +656,61 @@ router.post('/register-candidate', passportAuth, (req, res) => {
             message: 'Candidate Successfully Created.'
           });
         }
+      });
+    }
+  });
+});
+
+//Search Candidate
+router.post('/search-candidate', passportAuth, (req, res) => {
+  const { firstname, lastname } = req.body;
+
+  //Searching
+  Candidate.findCandidate(firstname, lastname, (err, data) => {
+    //Error
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      console.log(data);
+      return res.json({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Match Found'
+      });
+    }
+  });
+});
+
+//Candidate Delete route
+router.delete('/remove-candidate/:id', passportAuth, async (req, res) => {
+  const id = req.params.id;
+  Candidate.deleteCandidate(id, (err, data) => {
+    //Error
+    if (err) {
+      return res.json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true,
+        message: 'Admin Deleted Successfully'
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Match Found for Admin'
       });
     }
   });

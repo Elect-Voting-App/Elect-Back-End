@@ -23,9 +23,9 @@ Admin.register = (newAdmin, result) => {
       //On success 
       console.log('Admin Added Successfully');
       return result(null, { id: res.insertId, ...newAdmin });
-      
+
     } else {
-      return result(null,null);
+      return result(null, null);
     }
   });
 };
@@ -43,7 +43,7 @@ Admin.findByEmail = (adminEmail, result) => {
     //Email match found
     if (res.length > 0) {
       return result(null, res[0]);
-      
+
     } else {
       return result(null, null);
     }
@@ -76,7 +76,7 @@ Admin.getAll = result => {
   sql.query('SELECT id, firstname, lastname, email, role, date_registered FROM admin', (err, res) => {
     //Error
     if (err) {
-      console.log('Error: '+ err);
+      console.log('Error: ' + err);
       return result(err, null)
     }
 
@@ -120,9 +120,7 @@ Admin.deleteAdmin = (id, result) => {
 
     //No Match Found
     if (res.affectedRows == 0) {
-      //No token found
-      result(null, null);
-      return;
+      return result(null, null);
     }
 
     //On Success
