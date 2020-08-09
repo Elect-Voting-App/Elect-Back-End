@@ -309,10 +309,24 @@ router.put('/update-pass', passportAuth, async (req, res) => {
 
 
 /*==== VOTER ROUTER ====*/
-router.post('/register-voter', upload.single('file'), (req, res) => {
-  const file = req.file;
-  let ans = [];
-  csvOutput(file.filename, (err, data) => {
+router.post('/register-voter', passportAuth, async (req, res) => {
+  const row = req.body;
+
+  //Encrypting password
+  const hashedPassword = await encryption(row.Password);
+
+  let voter = new Voter({
+    firstname: row.Firstname,
+    lastname: row.Lastname,
+    email: row.Email,
+    studentID: row.StudentID,
+    hallID: row.Hall,
+    year: row.Year,
+    password: hashedPassword,
+    date_registered: date()
+  });
+
+  Voter.findByEmail(row.Email, (err, data) => {
     if (err) {
       return res.status(500).json({
         status: false,
@@ -320,28 +334,15 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
       });
     }
 
-    /* let i;
-    //Looping through result data
-    for (i = 0; i < data.length; i++) {
-      console.log(data[i]);
-      //Hashing password
-      const hashedPassword = syncEncryption(data[i].password);
-      
-      let voter = new Voter({
-        firstname: data[i].firstname,
-        lastname: data[i].lastname,
-        email: data[i].email,
-        studentID: data[i].studentID,
-        hallID: data[i].hallID,
-        year: data[i].year,
-        password: hashedPassword,
-        date_registered: date()
+    if (data) {
+      return res.json({
+        status: false,
+        message: `Voter with email ( ${row.Email} ) Already Exists.`
       });
-
-      console.log(voter);
-
-      //Check if voter exists 
-      Voter.findByEmail(data[i].email, (err, data) => {
+    } else {
+      //Inserting Data into Database
+      Voter.register(voter, (err, data) => {
+        //Error
         if (err) {
           return res.status(500).json({
             status: false,
@@ -349,104 +350,14 @@ router.post('/register-voter', upload.single('file'), (req, res) => {
           });
         }
         if (data) {
-          ans.push({
-            status: false,
-            message: `Voter with email ( ${data[i].email} ) Already Exists.`
-          });
-        }
-        else {
-          //Inserting Data into Database
-          Voter.register(voter, (err, data) => {
-            //Error
-            if (err) {
-              return res.status(500).json({
-                status: false,
-                message: err.message
-              });
-            }
-            if (data) {
-              return res.json({
-                status: true,
-                message: 'Voter Registered Successfully'
-              });
-            }
+          return res.json({
+            status: true,
+            message: 'Voter Registered Successfully'
           });
         }
       });
-      console.log(ans)
-    } */
-    data.forEach(row => {
-      //Hashing Password
-      const hashedPassword = syncEncryption(row.password);
-
-      let voter = new Voter({
-        firstname: row.firstname,
-        lastname: row.lastname,
-        email: row.email,
-        studentID: row.studentID,
-        hallID: row.hallID,
-        year: row.year,
-        password: hashedPassword,
-        date_registered: date()
-      });
-
-      console.log(voter)
-
-      //Check if voter exists 
-      Voter.findByEmail(row.email, (err, data) => {
-        if (err) {
-          return res.status(500).json({
-            status: false,
-            message: err.message
-          });
-        }
-        if (data) {
-          ans.push({
-            status: false,
-            message: `Voter with email ( ${row.email} ) Already Exists.`
-          });
-          console.log('Inside loop array ' + ans)
-        }
-        else {
-          //Inserting Data into Database
-          Voter.register(voter, (err, data) => {
-            //Error
-            if (err) {
-              return res.status(500).json({
-                status: false,
-                message: err.message
-              });
-            }
-            if (data) {
-              return res.json({
-                status: true,
-                message: 'Voter Registered Successfully'
-              });
-            }
-          });
-        }
-      });
-      console.log('loop got here')
-      // End of Check
-      // if (data.length) {
-
-      //   // console.log(ans.length);
-      //   // console.log(data.length);
-      //   res.json(ans);
-      // }
-      if (Object.keys(ans).length === data.length) {
-        console.log('got inside')
-        res.json(ans);
-      }
-    });
-    console.log('got here')
-    console.log(ans)
-    // if (Object.keys(ans).length === data.length) {
-    //   console.log('got inside')
-    //   res.json(ans);
-    // }
+    }
   });
-  console.log('outside')
 });
 
 //All Voters route

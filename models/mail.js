@@ -63,5 +63,31 @@ const passwordUpdate = async function passwordUpdate(user, callback) {
   callback(info);
 };
 
+//Creating Voter mailing
+const voterMailer = async function voterMail(user, callback) {
+  //Setting Mail Options
+  let mailOptions = {
+    from: `"ELECT VOTING SYSTEM" ${process.env.NODEMAILER_EMAIL}`, //Senders address
+    to: user.Email,
+    subject: 'ELECT Voting System: Voter Account',
+    html: `Hello ${user.Firstname} ${user.Lastname},<br>
+    An admin account has been created for you at ELECT Voting System and you have been issued with a new temporary password.<br>
+    Your current login information is:<br>
+    email: ${user.Email}<br>
+    password: ${user.Password}<br><br>
+    You will have to change your password when you log in for the first time.<br>
+    To start using ELECT Voting System, login at https://localhost:4200/login. In most mail programs, this should appear as a blue link which you can just click on. If that doesn't work, then copy and paste the address into your browser and press the enter key.<br>
+    Once you log in, you will be taken to your dashboard.<br><br>
+    ELECT Voting System Admin<br>
+    ${process.env.NODEMAILER_EMAIL}`
+  };
+
+  //Send email with defined transport object
+  let info = await transporter.sendMail(mailOptions);
+
+  callback(info);
+}
+
 module.exports.adminMailer = adminMailer;
 module.exports.passwordUpdate = passwordUpdate;
+module.exports.voterMailer = voterMailer;

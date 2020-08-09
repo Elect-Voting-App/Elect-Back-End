@@ -41,4 +41,22 @@ router.post('/update-pass', (req, res) => {
   });
 });
 
+//Send Voter Registration Email
+router.post('/voter', (req, res) => {
+  let user = req.body;
+  Mailer.voterMailer(user, info => {
+    if (info.accepted != null) {
+      return res.json({
+        status: true,
+        message: 'Voter Successfully Created.'
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: `Error Sending Voter (${user.Email}) email`
+      });
+    }
+  });
+});
+
 module.exports = router;
