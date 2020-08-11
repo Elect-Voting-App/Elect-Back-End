@@ -31,6 +31,27 @@ Voter.register = (newVoter, result) => {
   });
 };
 
+//Get voter password for validation
+Voter.getPass = (voterStudentID, result) => {
+  sql.query(`SELECT password FROM voter WHERE student_id = '${voterStudentID}'`, (err, res) => {
+    //Error 
+    if (err) {
+      console.log('Error: ' + err);
+      result(err, null);
+      return;
+    }
+
+    //Email match found
+    if (res.length > 0) {
+      return result(null, res[0]);
+    }
+    else {
+      //No match Found
+      return result(null, null);
+    }
+  });
+};
+
 //Finding Voter using email
 Voter.findByEmail = (voterEmail, result) => {
   sql.query(`SELECT id, firstname, lastname, email, date_registered FROM voter WHERE email = '${voterEmail}'`, (err, res) => {
@@ -51,6 +72,27 @@ Voter.findByEmail = (voterEmail, result) => {
   });
 };
 
+//Find by Student ID
+Voter.findByStudentID = (voterStudentID, result) => {
+  sql.query(`SELECT firstname, lastname, student_id, email, hall_name, change_password, date_registered FROM voter, hall WHERE student_id = '${voterStudentID}' AND voter.hall_id = hall.id`, (err, res) => {
+    //Error 
+    if (err) {
+      console.log('Error: ' + err);
+      result(err, null);
+      return;
+    }
+
+    //Email match found
+    if (res.length > 0) {
+      return result(null, res[0]);
+      
+    } else {
+      return result(null, null);
+    }
+  });
+};
+
+//Search Voter
 Voter.searchVoter = (voterEmail, result) => {
   sql.query(`SELECT firstname, lastname, student_id, email, hall_name, date_registered FROM voter, hall WHERE email LIKE '%${voterEmail}%' AND voter.hall_id = hall.id`, (err, res) => {
     //Error 
@@ -111,7 +153,7 @@ Voter.getAll = result => {
 
 //Update Voter Password 
 Voter.updatePassword = (adminEmail, adminPass, result) => {
-  sql.query(`UPDATE admin SET password = '${adminPass}' WHERE email = '${adminEmail}'`, (err, res) => {
+  sql.query(`UPDATE voter SET password = '${adminPass}' WHERE email = '${adminEmail}'`, (err, res) => {
     //Error 
     if (err) {
       return result(err, null);
@@ -125,6 +167,22 @@ Voter.updatePassword = (adminEmail, adminPass, result) => {
     //On Success
     console.log('Update Successful');
     return result(null, res);
+  });
+};
+
+//Saving refreshToken into Database
+Voter.saveRefreshToken = (voterStudentID, refreshToken, result) => {
+  sql.query("INSERT INTO token SET email = ?, refresh_token = ?", [voterStudentID, refreshToken], (err, res) => {
+    //Error 
+    if (err) {
+      console.log('Error: ' + err);
+      result(err, null);
+      return;
+    }
+
+    //On Success
+    console.log('Token Saved Successfully')
+    result(null, { id: res.insertId });
   });
 };
 
