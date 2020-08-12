@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { jwtSiging, passportAuth } = require('../misc/passport');
 const Voter = require('../models/voter');
-const { validation } = require('../misc/encryption');
+const { validation, encryption } = require('../misc/encryption');
 const randtoken = require('rand-token');
 
 //Voter Login route
@@ -22,6 +22,7 @@ router.post('/login', async (req, res) => {
         message: "Invalid Credentials."
       });
     }
+    console.log(data)
 
     //Validate Password
     const ans = await validation(password, data.password);
@@ -56,7 +57,7 @@ router.post('/login', async (req, res) => {
             }
 
             if (data) {
-              return res.json({status: true, jwt: token, name: voter.name, studentID: voter.studentID, hall: voter.hall, initialLogin: voter.initialLogin, refreshToken: refreshToken });
+              return res.json({ status: true, jwt: token, name: voter.name, studentID: voter.studentID, hall: voter.hall, initialLogin: voter.initialLogin, refreshToken: refreshToken });
             }
           });
         }
@@ -82,6 +83,81 @@ router.post('/logout', (req, res) => {
     }
 
     else return res.sendStatus(204);
+  });
+});
+
+// Voter Password Change 
+router.post('/password-change', (req, res) => {
+  const { studentID, oldPassword, newPassword, confirmPassword } = req.body;
+
+  console.log(req.body)
+  Voter.getPass(studentID, async (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (!data) {
+      return res.json({
+        status: false,
+        message: "Invalid Credentials."
+      });
+    }
+
+    //Validate Password
+    const ans = await validation(oldPassword, data.password);
+
+    if (ans) {
+      //Check if confirmPassword
+      if (newPassword === confirmPassword) {
+        const hashedPassword = await encryption(confirmPassword)
+        Voter.changePassword(studentID, hashedPassword, (err, data) => {
+          if (err) {
+            return res.status(500).json({
+              status: false,
+              message: err.message
+            });
+          }
+
+          if (data) {
+            // Change initial Status
+            Voter.changeInital(studentID, (err, data) => {
+              if (err) {
+                return res.status(500).json({
+                  status: false,
+                  message: err.message
+                });
+              }
+
+              if (data) {
+                return res.json({
+                  status: true,
+                  message: "Password Changed Successfully."
+                });
+              } else {
+                return res.json({
+                  status: false,
+                  message: "Failed to change inital password"
+                });
+              }
+            });
+          } else {
+            return res.json({
+              status: false,
+              message: "Failed to change password"
+            });
+          }
+        });
+
+      }
+    } else {
+      return res.json({
+        status: false,
+        message: "Invalid credential"
+      });
+    }
   });
 });
 

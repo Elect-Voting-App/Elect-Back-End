@@ -170,6 +170,42 @@ Voter.updatePassword = (adminEmail, adminPass, result) => {
   });
 };
 
+//Change Password
+Voter.changePassword = (voterStudentID, VoterPass, result) => {
+  sql.query(`UPDATE voter SET password = '${VoterPass}' WHERE student_id = '${voterStudentID}'`, (err, res) => {
+    //Error 
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 0) {
+      //No match found for the email
+      return result(null, null);
+    }
+
+    //On Success
+    console.log('Update Successful');
+    return result(null, res);
+  });
+};
+
+//Change initailLogin
+Voter.changeInital = (voterStudentID, result) => {
+  sql.query(`UPDATE voter SET change_password = '0' WHERE student_id = '${voterStudentID}'`, (err, res) => {
+    //MySql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 0) {
+      return result(null,null);
+    }
+
+    //On Success
+    return result(null,res);
+  });
+};
+
 //Saving refreshToken into Database
 Voter.saveRefreshToken = (voterStudentID, refreshToken, result) => {
   sql.query("INSERT INTO token SET email = ?, refresh_token = ?", [voterStudentID, refreshToken], (err, res) => {
