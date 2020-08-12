@@ -186,4 +186,23 @@ Voter.saveRefreshToken = (voterStudentID, refreshToken, result) => {
   });
 };
 
+//Deleting refreshToken
+Voter.deleteRefreshToken = (refreshToken, result) => {
+  sql.query(`DELETE FROM token WHERE refresh_token = '${refreshToken}'`, (err, res) => {
+    //Error
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 0) {
+      //No token found
+      return result(null, null);
+    }
+
+    //On Success
+    console.log('Token deleted Successfully');
+    return result(null, res);
+  });
+};
+
 module.exports = Voter;

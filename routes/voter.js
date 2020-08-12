@@ -70,4 +70,19 @@ router.post('/login', async (req, res) => {
   });
 });
 
+// Voter Logout Route
+router.post('/logout', passportAuth, (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  //Delete token from database
+  Voter.deleteRefreshToken(refreshToken, (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        message: err.message
+      });
+    }
+
+    else return res.sendStatus(204);
+  });
+});
+
 module.exports = router;
