@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Voter Logout Route
-router.post('/logout', passportAuth, (req, res) => {
+router.post('/logout', (req, res) => {
   const refreshToken = req.body.refreshToken;
   //Delete token from database
   Voter.deleteRefreshToken(refreshToken, (err, data) => {
