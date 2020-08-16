@@ -24,7 +24,7 @@ Voter.register = (newVoter, result) => {
     if (res.affectedRows == 1) {
       //On success
       console.log('Voter Registed Successfully');
-      return result(null, {id: res.insertId, ...newVoter });
+      return result(null, { id: res.insertId, ...newVoter });
     } else {
       return result(null, null);
     }
@@ -65,7 +65,7 @@ Voter.findByEmail = (voterEmail, result) => {
     //Email match found
     if (res.length > 0) {
       return result(null, res[0]);
-      
+
     } else {
       return result(null, null);
     }
@@ -85,7 +85,7 @@ Voter.findByStudentID = (voterStudentID, result) => {
     //Email match found
     if (res.length > 0) {
       return result(null, res[0]);
-      
+
     } else {
       return result(null, null);
     }
@@ -137,7 +137,7 @@ Voter.getAll = result => {
   sql.query('SELECT firstname, lastname, email, student_id, hall_name, year FROM voter, hall WHERE voter.hall_id = hall.id', (err, res) => {
     //Error
     if (err) {
-      console.log('Error: '+ err);
+      console.log('Error: ' + err);
       return result(err, null)
     }
 
@@ -198,11 +198,11 @@ Voter.changeInital = (voterStudentID, result) => {
     }
 
     if (res.affectedRows == 0) {
-      return result(null,null);
+      return result(null, null);
     }
 
     //On Success
-    return result(null,res);
+    return result(null, res);
   });
 };
 
@@ -238,6 +238,64 @@ Voter.deleteRefreshToken = (refreshToken, result) => {
     //On Success
     console.log('Token deleted Successfully');
     return result(null, res);
+  });
+};
+
+
+//Voting Models
+Voter.getCategory = result => {
+  sql.query('SELECT * FROM category', (err, res) => {
+    //Mysql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    //Getting admin data
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No admin data
+      return result(null, null);
+    }
+
+  });
+};
+
+Voter.getPosition = result => {
+  sql.query('SELECT * FROM position ', (err, res) => {
+    //Mysql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    //Getting admin data
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No admin data
+      return result(null, null);
+    }
+
+  });
+};
+
+Voter.getCandidate = result => {
+  sql.query(`select candidate.id, concat(firstname, ' ' ,lastname) AS fullname, position_name, category_name,
+  position.id AS positionID,
+  category.id AS categoryID
+  from candidate,position,category WHERE candidate.position_id = position.id AND candidate.category_id = category.id 
+  `, (err, res) => {
+    if (err) {
+      return result(err, null);
+    }
+
+    //Getting admin data
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      //No admin data
+      return result(null, null);
+    }
   });
 };
 

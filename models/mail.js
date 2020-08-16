@@ -29,7 +29,7 @@ const adminMailer = async function adminMail(user, callback) {
     email: ${user.email}<br>
     password: ${user.password}<br><br>
     You will have to change your password when you log in for the first time.<br>
-    To start using ELECT Voting System, login at https://localhost:4200/admin. In most mail programs, this should appear as a blue link which you can just click on. If that doesn't work, then copy and paste the address into your browser and press the enter key.<br>
+    To start using ELECT Voting System, login at http://165.227.81.2/admin. In most mail programs, this should appear as a blue link which you can just click on. If that doesn't work, then copy and paste the address into your browser and press the enter key.<br>
     Once you log in, you will be taken to your dashboard.<br><br>
     ELECT Voting System Admin<br>
     ${process.env.NODEMAILER_EMAIL}`
@@ -76,7 +76,7 @@ const voterMailer = async function voterMail(user, callback) {
     email: ${user.Email}<br>
     password: ${user.Password}<br><br>
     You will have to change your password when you log in for the first time.<br>
-    To start using ELECT Voting System, login at https://localhost:4200/login. In most mail programs, this should appear as a blue link which you can just click on. If that doesn't work, then copy and paste the address into your browser and press the enter key.<br>
+    To start using ELECT Voting System, login at http://165.227.81.2/login. In most mail programs, this should appear as a blue link which you can just click on. If that doesn't work, then copy and paste the address into your browser and press the enter key.<br>
     Once you log in, you will be taken to your dashboard.<br><br>
     ELECT Voting System Admin<br>
     ${process.env.NODEMAILER_EMAIL}`

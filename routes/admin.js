@@ -627,4 +627,79 @@ router.delete('/remove-candidate/:id', passportAuth, async (req, res) => {
   });
 });
 
+//Change Password
+router.post('/password-change', (req, res) => {
+  const { email, oldPassword, newPassword, confirmPassword } = req.body;
+
+  console.log(req.body)
+  Admin.getPass(email, async (err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (!data) {
+      return res.json({
+        status: false,
+        message: "Invalid Credentials."
+      });
+    }
+
+    //Validate Password
+    const ans = await validation(oldPassword, data.password);
+
+    if (ans) {
+      //Check if confirmPassword
+      if (newPassword === confirmPassword) {
+        const hashedPassword = await encryption(confirmPassword)
+        Admin.changePassword(email, hashedPassword, (err, data) => {
+          if (err) {
+            return res.status(500).json({
+              status: false,
+              message: err.message
+            });
+          }
+
+          if (data) {
+            // Change initial Status
+            Admin.changeInital(studentID, (err, data) => {
+              if (err) {
+                return res.status(500).json({
+                  status: false,
+                  message: err.message
+                });
+              }
+
+              if (data) {
+                return res.json({
+                  status: true,
+                  message: "Password Changed Successfully."
+                });
+              } else {
+                return res.json({
+                  status: false,
+                  message: "Failed to change inital password"
+                });
+              }
+            });
+          } else {
+            return res.json({
+              status: false,
+              message: "Failed to change password"
+            });
+          }
+        });
+
+      }
+    } else {
+      return res.json({
+        status: false,
+        message: "Invalid credential"
+      });
+    }
+  });
+});
+
 module.exports = router;

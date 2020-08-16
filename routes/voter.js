@@ -161,4 +161,76 @@ router.post('/password-change', (req, res) => {
   });
 });
 
+router.post('/categories', (req, res) => {
+  Voter.getCategory((err, data) => {
+    if (err) {
+      res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      res.json({
+        status: true,
+        data
+      });
+    } else {
+      res.json({
+        status: false,
+        message: 'No Category Found'
+      })
+    }
+  });
+});
+
+router.post('/positions', (req, res) => {
+  Voter.getPosition((err, data) => {
+    if (err) {
+      res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      res.json({
+        status: true,
+        data
+      });
+    } else {
+      res.json({
+        status: false,
+        message: 'No Position Found'
+      })
+    }
+  });
+});
+
+router.post('/candidates', (req, res) => {
+  const {position_id, category_id} = req.body;
+  // console.log(position_id,category_id)
+  Voter.getCandidate(position_id,category_id,(err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      console.log(data)
+      return res.json({
+        status: true,
+        data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Position Found'
+      })
+    }
+  });
+});
+
 module.exports = router;

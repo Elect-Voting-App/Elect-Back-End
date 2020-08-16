@@ -206,4 +206,21 @@ Admin.updatePassword = (adminEmail, adminPass, result) => {
   });
 };
 
+//Change initailLogin
+Admin.changeInital = (adminEmail, result) => {
+  sql.query(`UPDATE admin SET change_password = '0' WHERE email = '${adminEmail}'`, (err, res) => {
+    //MySql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.affectedRows == 0) {
+      return result(null, null);
+    }
+
+    //On Success
+    return result(null, res);
+  });
+};
+
 module.exports = Admin;
