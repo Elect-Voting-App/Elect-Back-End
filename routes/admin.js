@@ -50,7 +50,8 @@ router.post('/login', async (req, res) => {
           const admin = {
             name: data.firstname + ' ' + data.lastname,
             email: data.email,
-            role: data.role
+            role: data.role,
+            initialLogin: data.change_password
           };
 
           console.log('Got to signing')
@@ -69,7 +70,7 @@ router.post('/login', async (req, res) => {
 
             if (data) {
               console.log("Logging in");
-              return res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, refreshToken: refreshToken });
+              return res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, initialLogin: admin.initialLogin,refreshToken: refreshToken });
             }
           });
         }
@@ -654,7 +655,7 @@ router.post('/password-change', (req, res) => {
       //Check if confirmPassword
       if (newPassword === confirmPassword) {
         const hashedPassword = await encryption(confirmPassword)
-        Admin.changePassword(email, hashedPassword, (err, data) => {
+        Admin.updatePassword(email, hashedPassword, (err, data) => {
           if (err) {
             return res.status(500).json({
               status: false,
@@ -664,7 +665,7 @@ router.post('/password-change', (req, res) => {
 
           if (data) {
             // Change initial Status
-            Admin.changeInital(studentID, (err, data) => {
+            Admin.changeInital(email, (err, data) => {
               if (err) {
                 return res.status(500).json({
                   status: false,
@@ -700,6 +701,29 @@ router.post('/password-change', (req, res) => {
       });
     }
   });
+});
+
+router.post('/get-info', passportAuth, (req,res) => {
+  Admin.getInfo((err,data) => {
+    if(err) {
+      return res.status(500).json({
+        status:false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true, 
+        data: data
+      });
+    } else {
+      return res.json({
+        status: false, 
+        message: 'No data retrieved.'
+      });
+    }
+  })
 });
 
 module.exports = router;

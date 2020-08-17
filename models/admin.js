@@ -32,7 +32,7 @@ Admin.register = (newAdmin, result) => {
 
 //Finding Admin using email
 Admin.findByEmail = (adminEmail, result) => {
-  sql.query(`SELECT id, firstname, lastname, email, role, date_registered  FROM admin WHERE email = '${adminEmail}'`, (err, res) => {
+  sql.query(`SELECT id, firstname, lastname, email, role, change_password, date_registered  FROM admin WHERE email = '${adminEmail}'`, (err, res) => {
     //Error 
     if (err) {
       console.log('Error: ' + err);
@@ -220,6 +220,21 @@ Admin.changeInital = (adminEmail, result) => {
 
     //On Success
     return result(null, res);
+  });
+};
+
+Admin.getInfo = result => {
+  sql.query('Call getinfo()', (err,res) => {
+    //Mysql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.length > 0) {
+      return result(null, res);
+    } else {
+      return result(null, null);
+    }
   });
 };
 
