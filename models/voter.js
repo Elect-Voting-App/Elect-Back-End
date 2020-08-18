@@ -299,4 +299,19 @@ Voter.getCandidate = result => {
   });
 };
 
+Voter.getInitial = (studentID,result) => {
+  sql.query(`SELECT change_password FROM voter where student_id = '${studentID}'`, (err,res) => {
+    //Mysql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.length > 0) {
+      return result(null, res[0]);
+    } else {
+      return result(null, null);
+    }
+  });
+};
+
 module.exports = Voter;

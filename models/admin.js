@@ -8,6 +8,7 @@ const Admin = function (administrator) {
   this.email = administrator.email;
   this.password = administrator.password;
   this.role = administrator.role;
+  this.change_password = administrator.change_password;
   this.date_registered = administrator.date_registered;
 };
 
@@ -232,6 +233,21 @@ Admin.getInfo = result => {
 
     if (res.length > 0) {
       return result(null, res);
+    } else {
+      return result(null, null);
+    }
+  });
+};
+
+Admin.getInitial = (adminEmail,result) => {
+  sql.query(`SELECT change_password FROM admin where email = '${adminEmail}'`, (err,res) => {
+    //Mysql Error
+    if (err) {
+      return result(err, null);
+    }
+
+    if (res.length > 0) {
+      return result(null, res[0]);
     } else {
       return result(null, null);
     }

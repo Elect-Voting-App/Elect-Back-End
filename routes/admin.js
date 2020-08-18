@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
 
             if (data) {
               console.log("Logging in");
-              return res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, initialLogin: admin.initialLogin,refreshToken: refreshToken });
+              return res.json({ status: true, jwt: token, name: admin.name, email: admin.email, role: admin.role, initialLogin: admin.initialLogin, refreshToken: refreshToken });
             }
           });
         }
@@ -703,27 +703,52 @@ router.post('/password-change', (req, res) => {
   });
 });
 
-router.post('/get-info', passportAuth, (req,res) => {
-  Admin.getInfo((err,data) => {
-    if(err) {
+router.post('/get-info', passportAuth, (req, res) => {
+  Admin.getInfo((err, data) => {
+    if (err) {
       return res.status(500).json({
-        status:false,
+        status: false,
         message: err.message
       });
     }
 
     if (data) {
       return res.json({
-        status: true, 
+        status: true,
         data: data
       });
     } else {
       return res.json({
-        status: false, 
+        status: false,
         message: 'No data retrieved.'
       });
     }
   })
+});
+
+router.post('/initial', passportAuth, (req, res) => {
+  const {email} = req.body;
+  console.log(email)
+  Admin.getInitial(email,(err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true,
+        data: data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No data retrieved.'
+      });
+    }
+  });
 });
 
 module.exports = router;

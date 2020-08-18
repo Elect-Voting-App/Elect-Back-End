@@ -233,4 +233,28 @@ router.post('/candidates', (req, res) => {
   });
 });
 
+router.post('/initial', (req, res) => {
+  const {studentID} = req.body;
+  Voter.getInitial(studentID,(err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      return res.json({
+        status: true,
+        data: data
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: 'No data retrieved.'
+      });
+    }
+  });
+});
+
 module.exports = router;
