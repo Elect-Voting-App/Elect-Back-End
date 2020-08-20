@@ -208,9 +208,8 @@ router.post('/positions', (req, res) => {
 });
 
 router.post('/candidates', (req, res) => {
-  const {position_id, category_id} = req.body;
   // console.log(position_id,category_id)
-  Voter.getCandidate(position_id,category_id,(err, data) => {
+  Voter.getCandidate((err, data) => {
     if (err) {
       return res.status(500).json({
         status: false,
@@ -234,8 +233,8 @@ router.post('/candidates', (req, res) => {
 });
 
 router.post('/initial', (req, res) => {
-  const {studentID} = req.body;
-  Voter.getInitial(studentID,(err, data) => {
+  const studentID = req.body;
+  Voter.getInitial(studentID, (err, data) => {
     if (err) {
       return res.status(500).json({
         status: false,
