@@ -256,4 +256,77 @@ router.post('/initial', (req, res) => {
   });
 });
 
+router.post('/vote', (req, res) => {
+  const mydata = req.body.data;
+  let counter = 1;
+  for (let x of mydata) {
+    Voter.castVote(x, (err, data) => {
+      if (err) {
+        return res.status(500).json({
+          status: false,
+          message: err.message
+        });
+      }
+      if (data) {
+        counter++;
+        while (counter === mydata.length) {
+          return res.json({
+            status: true,
+            message: 'Voted Successfully'
+          });
+        }
+      }
+    });
+  }
+});
+
+router.post('/results', (req, res) => {
+  can_res = []
+  counter = 1;
+  Voter.getCandidate((err, data) => {
+    if (err) {
+      return res.status(500).json({
+        status: false,
+        message: err.message
+      });
+    }
+
+    if (data) {
+      for (const x of data) {
+
+        Voter.getResults(x.id, x.positionID, x.categoryID, (err, mydata) => {
+          if (err) {
+            return res.status(500).json({
+              status: false,
+              message: err.message
+            });
+          }
+
+          if (mydata) {
+            counter++;
+            can_res.push(mydata)
+            while (counter === data.length) {
+              return res.json({
+                status: true,
+                data: can_res
+              })
+            }
+          } else {
+            return res.json({
+              status: false,
+              message: 'Result not Found'
+            })
+          }
+        });
+      }
+    } else {
+      return res.json({
+        status: false,
+        message: 'No Position Found'
+      })
+    }
+  });
+  // console.log(position_id,category_id)
+});
+
 module.exports = router;

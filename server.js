@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 const dotenv = require('dotenv');
 const { passportInit, passportSess } = require('./misc/passport');
-
+var io = require('socket.io').listen(server);
 //Import Routes
 const adminRoutes = require('./routes/admin');
 const voterRoutes = require('./routes/voter');
@@ -27,4 +27,4 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/voter', voterRoutes);
 app.use('/api/mailing', mailer);
 
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
+var server = app.listen(PORT, console.log(`Server started on port ${PORT}`));

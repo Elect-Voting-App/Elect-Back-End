@@ -1,5 +1,6 @@
 //Getting database connection
 const sql = require('./db');
+const Candidate = require('./candidate');
 
 //Constructor for Voter
 const Voter = function (voter) {
@@ -310,6 +311,38 @@ Voter.getInitial = (studentID,result) => {
       return result(null, res[0]);
     } else {
       return result(null, null);
+    }
+  });
+};
+
+Voter.castVote = (voteID, result) => {
+  console.log(voteID)
+  sql.query(`INSERT INTO votes SET candidate = ?`, voteID, (err, res) => {
+    //MySql Error 
+    if (err) {
+      return result(err, null);
+    }
+    
+    if (res.affectedRows == 1) {
+      //On success
+      return result(null, { id: res.insertId });
+    } else {
+      return result(null, null);
+    }
+  });
+};
+
+Voter.getResults = (candidate_id, position_id, category_id, result) => {
+  sql.query(`select candidate.id, concat(firstname, ' ' ,lastname) AS fullname, position_name, category_name,
+  (SELECT count(candidate) FROM votes WHERE votes.candidate = ${candidate_id}) as votes from candidate,position,category WHERE position.id = ${position_id} AND category.id = ${category_id} AND candidate.id = ${candidate_id}`,(err, res) => {
+    //Mysql Error
+    if (err) {
+      return result(err,null)
+    }
+    if (res.length > 0) {
+      return result(null, res[0])
+    } else {
+      return result(null,null);
     }
   });
 };

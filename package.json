@@ -30,7 +30,8 @@
     "nodemailer": "^6.4.8",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "rand-token": "^1.0.1"
+    "rand-token": "^1.0.1",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
