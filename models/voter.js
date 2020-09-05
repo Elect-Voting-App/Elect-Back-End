@@ -301,7 +301,7 @@ Voter.getCandidate = result => {
 };
 
 Voter.getInitial = (studentID,result) => {
-  sql.query(`SELECT change_password FROM voter where student_id = '${studentID}'`, (err,res) => {
+  sql.query(`SELECT change_password from voter WHERE student_id = '${studentID}'`, (err,res) => {
     //Mysql Error
     if (err) {
       return result(err, null);

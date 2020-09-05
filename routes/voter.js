@@ -233,7 +233,7 @@ router.post('/candidates', (req, res) => {
 });
 
 router.post('/initial', (req, res) => {
-  const studentID = req.body;
+  const { studentID } = req.body;
   Voter.getInitial(studentID, (err, data) => {
     if (err) {
       return res.status(500).json({
@@ -243,6 +243,7 @@ router.post('/initial', (req, res) => {
     }
 
     if (data) {
+      console.log(data)
       return res.json({
         status: true,
         data: data
